@@ -2,12 +2,6 @@
 
 #include "snippets.h"
 
-#define PRESS(keycode) register_code16(keycode)
-#define RELEASE(keycode) unregister_code16(keycode)
-#define TAP(keycode) tap_code16(keycode)
-
-uint16_t VIM_QUEUE = KC_NO;
-
 enum alt_keycodes {
     L_BRI = SAFE_RANGE, //LED Brightness Increase
     L_BRD,              //LED Brightness Decrease
@@ -59,6 +53,45 @@ enum alt_keycodes {
     VIM_Y,
 };
 
+#define PRESS(keycode) register_code16(keycode)
+#define RELEASE(keycode) unregister_code16(keycode)
+#define TAP(keycode) tap_code16(keycode)
+
+void CMD(uint16_t keycode) {
+    PRESS(KC_LGUI);
+        TAP(keycode);
+    RELEASE(KC_LGUI);
+}
+
+void CTRL(uint16_t keycode) {
+    PRESS(KC_LCTRL);
+        TAP(keycode);
+    RELEASE(KC_LCTRL);
+}
+
+void SHIFT(uint16_t keycode) {
+    PRESS(KC_LSHIFT);
+        TAP(keycode);
+    RELEASE(KC_LSHIFT);
+}
+
+void ALT(uint16_t keycode) {
+    PRESS(KC_LALT);
+        TAP(keycode);
+    RELEASE(KC_LALT);
+}
+
+static uint16_t VIM_QUEUE = KC_NO;
+
+/**
+ * Sets the `VIM_QUEUE` variable to the incoming keycode.
+ * Pass `KC_NO` to cancel the operation.
+ * @param keycode
+ */
+void VIM_LEADER(uint16_t keycode) {
+    VIM_QUEUE = keycode;
+}
+
 void VIM_APPEND(void);
 void VIM_APPEND_LINE(void);
 void VIM_BACK(void);
@@ -102,39 +135,6 @@ void VIM_VISUAL_UP(void);
 void VIM_VISUAL_WORD(void);
 void VIM_WORD(void);
 void VIM_YANK(void);
-
-void CMD(uint16_t keycode) {
-    PRESS(KC_LGUI);
-        TAP(keycode);
-    RELEASE(KC_LGUI);
-}
-
-void CTRL(uint16_t keycode) {
-    PRESS(KC_LCTRL);
-        TAP(keycode);
-    RELEASE(KC_LCTRL);
-}
-
-void SHIFT(uint16_t keycode) {
-    PRESS(KC_LSHIFT);
-        TAP(keycode);
-    RELEASE(KC_LSHIFT);
-}
-
-void ALT(uint16_t keycode) {
-    PRESS(KC_LALT);
-        TAP(keycode);
-    RELEASE(KC_LALT);
-}
-
-/**
- * Sets the `VIM_QUEUE` variable to the incoming keycode.
- * Pass `KC_NO` to cancel the operation.
- * @param keycode
- */
-void VIM_LEADER(uint16_t keycode) {
-    VIM_QUEUE = keycode;
-}
 
 /***
  *     #######  #     #  #######       #####   #     #  #######  #######
@@ -789,14 +789,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_HOME, \
  HYPR_T(KC_CAPS),KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP,   KC_PGDN, \
-        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RGUI, MO(1),   KC_LEFT, KC_DOWN, KC_RGHT  \
+        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RGUI, TD(0),   KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
     [1] = LAYOUT(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_EJCT, KC_MUTE, \
         L_T_BR,  L_PSD,   L_BRI,   L_PSI,   L_EDG_I, M_LNAME, M_FNAME, KC_BTN1, KC_MS_U, KC_BTN2, KC_PSCR, KC_SLCK, KC_PAUS,G(KC_ESC),KC_END,  \
         L_T_PTD, L_PTP,   L_BRD,   L_PTN,   L_EDG_D, M_EMAIL, M_ADDR,  KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_U, KC_WH_D,          KC_INS,  KC_VOLU, \
         _______, L_T_MD,  L_T_ONF, M_PHONE, L_EDG_M, MD_BOOT, TG_NKRO,S(KC_ESC),KC_MRWD, KC_MFFD, KC_MPLY, _______,          KC_PGUP, KC_VOLD, \
-        TO(2),   _______, _______,                            DBG_FAC,                            _______, _______, KC_HOME, KC_PGDN, KC_END   \
+        _______, _______, _______,                            DBG_FAC,                            _______, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
     [2] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -1159,4 +1159,19 @@ led_instruction_t led_instructions[] = {
 
     //end must be set to 1 to indicate end of instruction set
      { .end = 1 }
+};
+
+static bool td_pressed = false;
+
+void td_finished(qk_tap_dance_state_t *state, void *user_data) {
+    td_pressed = state->pressed;
+    layer_on(td_pressed ? 1 : 2);
+}
+
+void td_reset(qk_tap_dance_state_t *state, void *user_data) {
+    if (td_pressed) { layer_off(1); }
+}
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+    [0] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_finished, td_reset)
 };
