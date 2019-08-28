@@ -800,9 +800,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [2] = LAYOUT(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_EJCT, KC_MUTE, \
-        L_T_BR,  L_PSD,   L_BRI,   L_PSI,   L_EDG_I, M_LNAME, M_FNAME, KC_BTN1, KC_MS_U, KC_BTN2, KC_PSCR, KC_SLCK, KC_PAUS,G(KC_ESC),KC_END,  \
+        L_T_BR,  L_PSD,   L_BRI,   L_PSI,   L_EDG_I, M_LNAME, M_FNAME, KC_BTN1, KC_MS_U, KC_BTN2, KC_PSCR, KC_SLCK, KC_PAUS, KC_ESC,  KC_END,  \
         L_T_PTD, L_PTP,   L_BRD,   L_PTN,   L_EDG_D, M_EMAIL, M_ADDR,  KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_U, KC_WH_D,          KC_INS,  KC_VOLU, \
-        _______, L_T_MD,  L_T_ONF, M_PHONE, L_EDG_M, MD_BOOT, TG_NKRO,S(KC_ESC),KC_MRWD, KC_MFFD, KC_MPLY, _______,          KC_PGUP, KC_VOLD, \
+        _______, L_T_MD,  L_T_ONF, M_PHONE, L_EDG_M, MD_BOOT, TG_NKRO, U_T_AGCR,KC_MRWD, KC_MFFD, KC_MPLY, _______,          KC_PGUP, KC_VOLD, \
         _______, _______, _______,                            DBG_FAC,                            _______, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
     /*
